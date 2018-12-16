@@ -1,9 +1,11 @@
 <mat-list>
   <ng-container *ngFor="let s of stations">
     <mat-list-item>
-      {{s.id}} - {{s.name}} - {{s.availableBikes }} vélos ; {{ s.availableSlots }} places [ {{
-      s.type === StationType.CARD ? 'CB' : '' }} ]
-    </mat-list-item>
-    <mat-divider></mat-divider>
-  </ng-container>
-</mat-list>
+      {{s.id}} - {{s.name}} - {{s.availableBikes }} vélos ; {{ s.availableSlots }} places <br/>
+        <i class="material-icons" *ngIf="s.type === StationType.CARD">
+          credit_card
+        </i>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+    </ng-container>
+  </mat-list>
