@@ -12,11 +12,13 @@ import { ListStationsComponent } from './list-stations/list-stations.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { StationsMapComponent } from './stations-map/stations-map.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ListStationsComponent
+    ListStationsComponent,
+    StationsMapComponent
   ],
   imports: [
     BrowserModule,
