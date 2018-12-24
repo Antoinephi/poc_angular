@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { StationService } from '../shared/station.service';
+import { Station } from '../shared/station';
+import OlMap from 'ol/Map';
+import OlXYZ from 'ol/source/XYZ';
+import OlTileLayer from 'ol/layer/Tile';
+import OlView from 'ol/View';
 
-declare var ol: any;
+import { fromLonLat, addCommon } from 'ol/proj';
 
 @Component({
   selector: 'app-stations-map',
@@ -8,25 +14,40 @@ declare var ol: any;
   styleUrls: ['./stations-map.component.scss']
 })
 export class StationsMapComponent implements OnInit {
-  latitude: number = 50.6336555;
-  longitude: number = 3.0587139;
-  map: any;
+  private latitude = 50.6336555;
+  private longitude = 3.0587139;
+  // private map: Map;
+  private stationsList: Array<Station> = [];
 
-  constructor() { }
-  
+  constructor(private stationService: StationService) { }
+
+  map: OlMap;
+  source: OlXYZ;
+  layer: OlTileLayer;
+  view: OlView;
+
   ngOnInit() {
-    this.map = new ol.Map({
-      target: 'map',
-      layers: [
-        new ol.layer.Tile({
-          source: new ol.source.OSM()
-        })
-      ],
-      view: new ol.View({
-        center: ol.proj.fromLonLat([this.longitude, this.latitude]),
-        zoom: 18
-      })
+    addCommon();
+    this.source = new OlXYZ({
+      url: 'https://tile.osm.org/{z}/{x}/{y}.png'
     });
-  }
 
+    this.layer = new OlTileLayer({
+      source: this.source
+    });
+
+    this.view = new OlView({
+      center: fromLonLat([this.longitude, this.latitude]),
+      zoom: 18
+    });
+
+    this.map = new OlMap({
+      target: 'map',
+      layers: [this.layer],
+      view: this.view
+    });
+    // this.stationService.getStations().subscribe(
+    //   station => this.stationsList.push(station)
+    // );
+  }
 }
