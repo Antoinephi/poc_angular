@@ -5,8 +5,10 @@
     [opened]="!(isHandset$ | async)">
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item [routerLink]="['list']">Link 1</a>
-      <a mat-list-item [routerLink]="['map']">Link 2</a>
+      <a mat-list-item (click)="drawer.mode === 'over' && drawer.close()"
+        [routerLink]="['list']">Liste des stations</a>
+      <a mat-list-item (click)="drawer.mode === 'over' && drawer.close()"
+        [routerLink]="['map']">Carte</a>
       <a mat-list-item href="#">Link 3</a>
     </mat-nav-list>
   </mat-sidenav>

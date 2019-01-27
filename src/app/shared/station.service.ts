@@ -19,9 +19,9 @@ export class StationService {
     return this.http.get<any>(this.apiUrl).pipe(
       tap(data => data.records.sort((a, b) => a.fields.libelle - b.fields.libelle)),
       flatMap((data: any) => data.records),
-      map(data => this.mapToStation(data)),
-      tap(data => console.log(data)
-      )
+      map(data => this.mapToStation(data))
+      // , tap(data => console.log(data)
+      // )
     );
   }
 
