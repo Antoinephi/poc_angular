@@ -18,24 +18,29 @@
 
 .main-container {
   min-height: 100%;
-  // overflow: scroll;
+  overflow: hidden;
 
   .title-icon {
     padding: 0 14px;
   }
 
   .content-container {
-    margin-top: 50px;
-    height: 100vh;
-    overflow: hidden;
+    margin: 50px 0;
+    // height: 100%;
+    overflow-y: scroll;
   }
 
-  // app-nav-footer {
-  //   position: fixed;
-  // }
+  app-nav-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: 100;
+  }
 
   mat-toolbar {
-    position: fixed;
+    position: absolute;
+    top: 0;
+    width: 100%;
     z-index: 100;
   }
 }
