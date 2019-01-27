@@ -7,20 +7,22 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { LayoutModule } from '@angular/cdk/layout';
-import { MatToolbarModule, MatButtonModule, MatIconModule, MatListModule, MatCardModule } from '@angular/material';
+import { MatToolbarModule, MatButtonModule, MatIconModule, MatListModule, MatCardModule, MatTabsModule } from '@angular/material';
 import { ListStationsComponent } from './list-stations/list-stations.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { StationsMapComponent } from './stations-map/stations-map.component';
 import { StationInfoBannerComponent } from './stations-map/station-info-banner/station-info-banner.component';
+import { NavFooterComponent } from './nav-footer/nav-footer.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ListStationsComponent,
     StationsMapComponent,
-    StationInfoBannerComponent
+    StationInfoBannerComponent,
+    NavFooterComponent
   ],
   imports: [
     BrowserModule,
@@ -28,6 +30,7 @@ import { StationInfoBannerComponent } from './stations-map/station-info-banner/s
     BrowserAnimationsModule,
     HttpClientModule,
 
+    MatTabsModule,
     MatCardModule,
     MatSidenavModule,
     LayoutModule,
