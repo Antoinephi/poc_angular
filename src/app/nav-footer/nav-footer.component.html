@@ -6,6 +6,12 @@
 <!-- <router-outlet></router-outlet> -->
 
 <nav mat-tab-nav-bar backgroundColor="primary" mat-align-tabs="center">
-  <a mat-tab-link label="Stations" [routerLink]="['list']" routerLinkActive> Content 1 </a>
-  <a mat-tab-link label="Carte" [routerLink]="['map']" routerLinkActive> Content 2 </a>
+  <a mat-tab-link label="Stations" [routerLink]="['list']" routerLinkActive> <mat-icon>
+      star_rate
+    </mat-icon> </a>
+  <a mat-tab-link label="Carte" [routerLink]="['map']" routerLinkActive>
+    <mat-icon>
+      map
+    </mat-icon>
+  </a>
 </nav>

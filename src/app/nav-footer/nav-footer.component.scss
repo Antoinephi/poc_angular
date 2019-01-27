@@ -1,0 +1,14 @@
+:host /deep/ {
+  div.mat-tab-links {
+    height: 60px;
+  }
+  mat-icon {
+    font-size: 30px;
+  }
+  a {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-items: center;
+  }
+}
