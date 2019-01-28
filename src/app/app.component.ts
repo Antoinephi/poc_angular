@@ -1,7 +1,4 @@
 import { Component, Host, HostListener } from '@angular/core';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -9,13 +6,9 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
-    .pipe(
-      map(result => result.matches)
-    );
   public dynamicHeight = window.innerHeight;
 
-  constructor(private breakpointObserver: BreakpointObserver) {
+  constructor() {
   }
 
   // @HostListener('window:resize', ['$event'])
