@@ -5,7 +5,7 @@ import { StationsMapComponent } from './stations-map/stations-map.component';
 
 const routes: Routes = [
   {
-    path: '', component: ListStationsComponent
+    path: '', redirectTo: 'list', pathMatch: 'full'
   },
   {
     path: 'list', component: ListStationsComponent
