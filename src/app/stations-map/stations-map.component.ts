@@ -16,6 +16,7 @@ import OlText from 'ol/style/Text';
 import OlFill from 'ol/style/Fill';
 import { StationType } from '../shared/station-type.enum';
 import Stroke from 'ol/style/Stroke';
+import { GeolocationService } from '../geolocation/geolocation.service';
 
 @Component({
   selector: 'app-stations-map',
@@ -40,7 +41,7 @@ export class StationsMapComponent implements OnInit {
 
   public showInfoBanner = true;
 
-  constructor(private stationService: StationService) { }
+  constructor(private stationService: StationService, private geolocationService: GeolocationService) { }
 
   map: OlMap;
   source: OlXYZ;
@@ -49,6 +50,12 @@ export class StationsMapComponent implements OnInit {
 
   ngOnInit() {
 
+    this.geolocationService.getCurrentLocation(location => {
+      if (location) {
+        this.latitude = location.coords.latitude;
+        this.longitude = location.coords.longitude;
+      }
+    });
 
     addCommon();
     this.source = new OlXYZ({
@@ -61,7 +68,7 @@ export class StationsMapComponent implements OnInit {
 
     this.view = new OlView({
       center: fromLonLat([this.longitude, this.latitude]),
-      zoom: 18
+      zoom: 16
     });
 
     this.map = new OlMap({
