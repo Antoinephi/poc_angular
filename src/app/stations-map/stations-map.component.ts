@@ -12,7 +12,10 @@ import OlSourceVector from 'ol/source/Vector';
 import { Style, Icon } from 'ol/style';
 import { fromLonLat, addCommon } from 'ol/proj';
 import Overlay from 'ol/Overlay';
+import OlText from 'ol/style/Text';
+import OlFill from 'ol/style/Fill';
 import { StationType } from '../shared/station-type.enum';
+import Stroke from 'ol/style/Stroke';
 
 @Component({
   selector: 'app-stations-map',
@@ -29,7 +32,7 @@ export class StationsMapComponent implements OnInit {
     name: 'Test station name',
     availableBikes: 23,
     availableSlots: 42,
-    state: "Available",
+    state: 'Available',
     type: StationType.CARD,
     lastUpdated: '23/03/2019',
     coordinates: { latitude: 23, longitude: 42 }
@@ -79,14 +82,26 @@ export class StationsMapComponent implements OnInit {
           ...station
         });
 
-        const iconStyle = new Style({
+        const iconStyle = [new Style({
           image: new Icon(({
             anchor: [0.5, 46],
             anchorXUnits: 'fraction',
             anchorYUnits: 'pixels',
             src: 'assets/marker_48.png'
-          }))
-        });
+          })), text: new OlText({
+            text: `V:${station.availableBikes} / P:${station.availableSlots}`,
+            offsetY: -25,
+            scale: 1.5,
+            fill: new OlFill({
+              color: '#000'
+            }),
+            stroke: new Stroke({
+              color: '#fff',
+              width: 2
+            })
+          })
+        })
+        ];
 
         marker.setStyle(iconStyle);
         markers.push(marker);
@@ -101,12 +116,11 @@ export class StationsMapComponent implements OnInit {
         this.map.addLayer(markerVectorLayer);
 
         const popup = new Overlay({
-          // element: element,
           positioning: 'bottom-center',
           stopEvent: false,
           offset: [0, -50]
         });
-       this.map.addOverlay(popup);
+        this.map.addOverlay(popup);
 
       }
     );
@@ -118,6 +132,8 @@ export class StationsMapComponent implements OnInit {
         this.selectedStation = feature.getProperties();
       }
     });
+
+    this.map.getView().on('change:resolution', event => console.log({ event }));
 
   }
 }
