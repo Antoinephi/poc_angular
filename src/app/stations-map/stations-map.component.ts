@@ -54,6 +54,9 @@ export class StationsMapComponent implements OnInit {
       if (location) {
         this.latitude = location.coords.latitude;
         this.longitude = location.coords.longitude;
+        if(this.view) {
+          this.view.setCenter(fromLonLat([this.longitude, this.latitude]));
+        }
       }
     });
 
