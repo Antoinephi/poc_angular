@@ -9,7 +9,7 @@ import OlFeature from 'ol/Feature';
 import OlPoint from 'ol/geom/Point';
 import OlVector from 'ol/layer/Vector';
 import OlSourceVector from 'ol/source/Vector';
-import { Style, Icon } from 'ol/style';
+import { Style, Icon, Circle } from 'ol/style';
 import { fromLonLat, addCommon } from 'ol/proj';
 import Overlay from 'ol/Overlay';
 import OlText from 'ol/style/Text';
@@ -17,6 +17,7 @@ import OlFill from 'ol/style/Fill';
 import { StationType } from '../shared/station-type.enum';
 import Stroke from 'ol/style/Stroke';
 import { GeolocationService } from '../geolocation/geolocation.service';
+import OlGeolocation from 'ol/Geolocation';
 
 @Component({
   selector: 'app-stations-map',
@@ -50,28 +51,39 @@ export class StationsMapComponent implements OnInit {
 
   ngOnInit() {
 
-    this.geolocationService.getCurrentLocation(location => {
-      if (location) {
-        this.latitude = location.coords.latitude;
-        this.longitude = location.coords.longitude;
-        if(this.view) {
-          this.view.setCenter(fromLonLat([this.longitude, this.latitude]));
-        }
-      }
-    });
+    // this.geolocationService.getCurrentLocation(location => {
+    //   if (location) {
+    //     this.latitude = location.coords.latitude;
+    //     this.longitude = location.coords.longitude;
+    //     if(this.view) {
+    //       this.view.setCenter(fromLonLat([this.longitude, this.latitude]));
+    //     }
+    //   }
+    // });
 
     addCommon();
+
+    
     this.source = new OlXYZ({
       url: 'https://tile.osm.org/{z}/{x}/{y}.png'
     });
-
+    
     this.layer = new OlTileLayer({
       source: this.source
     });
-
+    
     this.view = new OlView({
-      center: fromLonLat([this.longitude, this.latitude]),
+      // center: fromLonLat([this.longitude, this.latitude]),
+      center: [0,0],
       zoom: 16
+    });
+    
+    const geolocation = new OlGeolocation({
+      trackingOptions: {
+        enableHighAccuracy: true
+      },
+      tracking: true,
+      projection: this.view.getProjection()
     });
 
     this.map = new OlMap({
@@ -80,7 +92,26 @@ export class StationsMapComponent implements OnInit {
       view: this.view
     });
 
-    const markers = [];
+    const accuracyFeature = new OlFeature();
+    geolocation.on('change:accuracyGeometry', function() {
+      accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+    });
+    
+    const positionFeature = new OlFeature();
+    positionFeature.setStyle(new Style({
+      image: new Circle({
+        radius: 6,
+        fill: new OlFill({
+          color: '#3399CC'
+        }),
+        stroke: new Stroke({
+          color: '#fff',
+          width: 2
+        })
+      })
+    }));
+    
+    const markers = [accuracyFeature, positionFeature];
 
     this.stationService.getStations().subscribe(
       (station: Station) => {
@@ -131,7 +162,6 @@ export class StationsMapComponent implements OnInit {
           offset: [0, -50]
         });
         this.map.addOverlay(popup);
-
       }
     );
 
@@ -144,6 +174,13 @@ export class StationsMapComponent implements OnInit {
     });
 
     this.map.getView().on('change:resolution', event => console.log({ event }));
+
+    geolocation.on('change:position', () => {
+      console.log('change position');
+      
+      const coordinates = geolocation.getPosition();
+      positionFeature.setGeometry(coordinates ? new OlPoint(coordinates): null);
+    });
 
   }
 }
