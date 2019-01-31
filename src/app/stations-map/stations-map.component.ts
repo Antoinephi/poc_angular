@@ -28,6 +28,11 @@ export class StationsMapComponent implements OnInit {
   private latitude = 50.6336555;
   private longitude = 3.0587139;
   private stationsList: Array<Station> = [];
+  private positionFeature = new OlFeature();
+  private accuracyFeature = new OlFeature();
+  private accuracyRadius = 30;
+  private accuracy = 0;
+  private currZoom = 0;
 
   public selectedStation: Station = {
     id: 23,
@@ -49,35 +54,37 @@ export class StationsMapComponent implements OnInit {
   layer: OlTileLayer;
   view: OlView;
 
+  ngAfterViewChecked() {
+    this.map.on('rendercomplete', () => {
+      this.geolocationService.getCurrentLocation(location => {
+        if (location) {
+          this.latitude = location.coords.latitude;
+          this.longitude = location.coords.longitude;
+          this.accuracy = location.coords.accuracy;
+          this.updatePositionMarker();
+        }
+      });
+    });
+  }
+
   ngOnInit() {
 
-    // this.geolocationService.getCurrentLocation(location => {
-    //   if (location) {
-    //     this.latitude = location.coords.latitude;
-    //     this.longitude = location.coords.longitude;
-    //     if(this.view) {
-    //       this.view.setCenter(fromLonLat([this.longitude, this.latitude]));
-    //     }
-    //   }
-    // });
-
     addCommon();
-
-    
     this.source = new OlXYZ({
       url: 'https://tile.osm.org/{z}/{x}/{y}.png'
     });
-    
+
     this.layer = new OlTileLayer({
+      preload: Infinity,
       source: this.source
     });
-    
+
     this.view = new OlView({
       // center: fromLonLat([this.longitude, this.latitude]),
-      center: [0,0],
+      center: [0, 0],
       zoom: 16
     });
-    
+
     const geolocation = new OlGeolocation({
       trackingOptions: {
         enableHighAccuracy: true
@@ -92,13 +99,26 @@ export class StationsMapComponent implements OnInit {
       view: this.view
     });
 
-    const accuracyFeature = new OlFeature();
-    geolocation.on('change:accuracyGeometry', function() {
-      accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
-    });
-    
-    const positionFeature = new OlFeature();
-    positionFeature.setStyle(new Style({
+    this.accuracyFeature.setStyle(new Style({
+      zIndex: 10,
+      image: new Circle({
+        radius: this.accuracyRadius,
+        fill: new OlFill({
+          color: 'rgb(51, 153, 204, 0.6)'
+        }),
+        stroke: new Stroke({
+          color: '#fff',
+          width: 1
+        })
+      })
+    }));
+
+    // geolocation.on('change:accuracyGeometry', function () {
+    //   this.accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+    // });
+
+    this.positionFeature.setStyle(new Style({
+      zIndex: 100,
       image: new Circle({
         radius: 6,
         fill: new OlFill({
@@ -110,8 +130,8 @@ export class StationsMapComponent implements OnInit {
         })
       })
     }));
-    
-    const markers = [accuracyFeature, positionFeature];
+
+    const markers = [this.positionFeature, this.accuracyFeature];
 
     this.stationService.getStations().subscribe(
       (station: Station) => {
@@ -156,12 +176,12 @@ export class StationsMapComponent implements OnInit {
         });
         this.map.addLayer(markerVectorLayer);
 
-        const popup = new Overlay({
-          positioning: 'bottom-center',
-          stopEvent: false,
-          offset: [0, -50]
-        });
-        this.map.addOverlay(popup);
+        // const popup = new Overlay({
+        //   positioning: 'bottom-center',
+        //   stopEvent: false,
+        //   offset: [0, -50]
+        // });
+        // this.map.addOverlay(popup);
       }
     );
 
@@ -173,15 +193,33 @@ export class StationsMapComponent implements OnInit {
       }
     });
 
-    this.map.getView().on('change:resolution', event => console.log({ event }));
-
-    geolocation.on('change:position', () => {
-      console.log('change position');
-      
-      const coordinates = geolocation.getPosition();
-      positionFeature.setGeometry(coordinates ? new OlPoint(coordinates): null);
+    this.map.getView().on('change:resolution', event => {
+      // console.log({ event });
+      this.currZoom = event.oldValue;
+      // console.log(this.accuracy, this.currZoom, this.accuracy * 2 - this.currZoom);
+      this.accuracyFeature.getStyle().getImage().setRadius(Math.max(this.accuracy * 2 - this.currZoom, 0));
     });
 
+    // geolocation.on('change:position', () => {
+    //   console.log('change position');
+    //   console.log(geolocation.getAccuracy());
+    //   const coordinates = geolocation.getPosition();
+    //   console.log({ coordinates, geolocation });
+    //   this.geolocationService.getCurrentLocation(location => {
+    //     if (location) {
+    //       console.log({ location });
+    //     }
+    //   });
+    //   this.positionFeature.setGeometry(coordinates ? new OlPoint(coordinates) : null);
+    // });
+
+  }
+
+  private updatePositionMarker() {
+    this.accuracyFeature.setGeometry(new OlPoint(fromLonLat([this.longitude, this.latitude])));
+    this.positionFeature.setGeometry(new OlPoint(fromLonLat([this.longitude, this.latitude])));
+    this.accuracyFeature.getStyle().getImage().setRadius(this.accuracy * 2 - this.currZoom);
+    this.view.setCenter(fromLonLat([this.longitude, this.latitude]));
   }
 }
 

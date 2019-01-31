@@ -12,4 +12,11 @@ export class GeolocationService {
       throw new Error('No geolocation');
     }
   }
+
+  public get() {
+    if (navigator.geolocation) {
+      return navigator.geolocation;
+    }
+  }
+
 }
