@@ -33,7 +33,6 @@ export class StationsMapComponent implements OnInit {
   private accuracyRadius = 30;
   private accuracy = 0;
   private currZoom = 0;
-
   public selectedStation: Station = {
     id: 23,
     name: 'Test station name',
@@ -46,6 +45,7 @@ export class StationsMapComponent implements OnInit {
   };
 
   public showInfoBanner = true;
+  private onZoomTimeout;
 
   constructor(private stationService: StationService, private geolocationService: GeolocationService) { }
 
@@ -133,8 +133,9 @@ export class StationsMapComponent implements OnInit {
 
     const markers = [this.positionFeature, this.accuracyFeature];
 
-    this.stationService.getStations().subscribe(
+    this.stationService.getClosestStations(this.latitude, this.longitude).subscribe(
       (station: Station) => {
+        console.log({ station })
         this.stationsList.push(station);
         const marker = new OlFeature({
           geometry: new OlPoint(
@@ -194,10 +195,11 @@ export class StationsMapComponent implements OnInit {
     });
 
     this.map.getView().on('change:resolution', event => {
-      // console.log({ event });
+      clearTimeout(this.onZoomTimeout);
       this.currZoom = event.oldValue;
-      // console.log(this.accuracy, this.currZoom, this.accuracy * 2 - this.currZoom);
-      this.accuracyFeature.getStyle().getImage().setRadius(Math.max(this.accuracy * 2 - this.currZoom, 0));
+      this.onZoomTimeout = setTimeout(() => {
+        this.accuracyFeature.getStyle().getImage().setRadius(Math.max(this.accuracy * 2 - this.currZoom, 0));
+      }, 500);
     });
 
     // geolocation.on('change:position', () => {
